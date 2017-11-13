@@ -23,9 +23,14 @@ GLfloat Observer_angle_x;
 GLfloat Observer_angle_y;
 
 // Objetos
+
 _puntos3D puntos(); 
 _triangulos3D triangulo();
 _revolucion revo();
+_piramide lapira(5,7);
+_cubo elcubo(5);
+_ply objeto("./ply_files/beethoven.ply",1);
+
 _lego legamen;
 
 // variables que controlan la ventana y la transformacion de perspectiva
@@ -105,11 +110,14 @@ void draw_objects()
 
 	if (teclaPulsada == '1') {
 		cout << "MODO PIRAMIDE\n---------" << endl;
+		lapira.draw_solido(0.2,1,1);
 		modo = 1;
 		
 	} else if (teclaPulsada == '2') {
 		//cout << "MODO CUBO\n---------" << endl;
+
 		modo = 2;
+		elcubo.draw_solido(0.3,1,0.6);
 		
 	} else if (teclaPulsada == '3') {
 		modo = 3;
@@ -124,7 +132,8 @@ void draw_objects()
 	}
 
 	if (modo == 1) {
-		_piramide lapira(5,7);
+		lapira.draw_solido(0,1,1);
+		lapira.draw_aristas(0,0,0,2);
 		if (teclaPulsada == 'p')
 			lapira.draw_puntos(1, 0, 0, 10);
 		else if (teclaPulsada ==  'l')
@@ -139,7 +148,8 @@ void draw_objects()
 	}
 	// MODO CUBO
 	if (modo == 2) {
-		_cubo elcubo(5);
+		elcubo.draw_solido(1,1,1);
+		elcubo.draw_aristas(0, 0, 0, 2);
 		if (teclaPulsada == 'p')
 			elcubo.draw_puntos(0.9, 0.23, 0.4, 1);
 		else if (teclaPulsada ==  'l')
@@ -155,10 +165,12 @@ void draw_objects()
 	
 	// MODO PLY
 	if (modo == 3) {
-		_ply objeto;
-		objeto.leer("./ply_files/beethoven.ply",1);
-		if (teclaPulsada == 'p')
+		objeto.draw_solido(0.142, 0.01, 1);
+		objeto.draw_aristas(0,0,0,1);
+		if (teclaPulsada == 'p') {
 			objeto.draw_puntos(0.9, 0.23, 0.4, 1);
+			cout << "Dibujando puntos?" << endl;
+		}
 		else if (teclaPulsada ==  'l')
 			objeto.draw_aristas(0, 0, 0, 2);
 		else if (teclaPulsada == 'f') {
@@ -240,6 +252,9 @@ void draw_objects()
 	}
 
 	teclaPulsada = '0';
+	glutPostRedisplay();
+
+
 
 }
 

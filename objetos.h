@@ -64,9 +64,15 @@ class _piramide : public _triangulos3D
 	_piramide(float tam = 0.5, float al = 0.75);
 };
 
+//*************************************************************************
+// clase PLY
+//*************************************************************************
+
 class _ply : public _triangulos3D
 {
 public:
+	_ply();
+	_ply(string archivo, float tam);
 	void leer(string archivo, float tam);
 };
 

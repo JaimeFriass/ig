@@ -165,8 +165,44 @@ _piramide::_piramide(float tam, float al) {
     colores[4].r = 0.1; colores[4].g = 0.6; colores[4].b = 0.3;
 }
 
+//*************************************************************************
+// clase ply
+//*************************************************************************
+
 void _ply::leer(string archivo, float tam) {
 
+    _file_ply file;
+    vector<_vertex3f> fvertices;
+    vector<_vertex3i> ftriangulos;
+
+    if (file.open(archivo)) {
+        file.read(fvertices, ftriangulos);
+
+        for (int i = 0; i < fvertices.size() ; i++) {
+            _vertex3f vert;
+            vert = fvertices[i];
+            vert.x = vert.x*tam;
+            vert.y = vert.y*tam;
+            vert.z = vert.z*tam;
+            vertices.push_back(vert);
+        }
+    
+        for (int i = 0; i < ftriangulos.size() ; i++) {
+            _vertex3i car;
+            car = ftriangulos[i];
+            caras.push_back(car);
+        }
+
+        //cout << "Leido\nVertices: " << vertices.size() << "\nCaras: " << caras.size() << endl;
+
+    } else
+        cout << "Error al leer el archivo" << endl;
+}
+_ply::_ply() {
+    
+}
+
+_ply::_ply(string archivo, float tam) {
     _file_ply file;
     vector<_vertex3f> fvertices;
     vector<_vertex3i> ftriangulos;
