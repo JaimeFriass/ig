@@ -576,8 +576,8 @@ void _lego::alternar_baile() {
 }
 void _lego::bailar() {
 
-    int num= (TOPE_MANO_ADELANTE +rand()%(TOPE_MANO_ATRAS-TOPE_MANO_ADELANTE))*0.2;
-    cout << "[BAILE] Generado num1 = " << num << " +/- " << mov[LU] << endl;
+    int num= (TOPE_MANO_ADELANTE +rand()%(TOPE_MANO_ATRAS-TOPE_MANO_ADELANTE))*0.1;
+    //cout << "[BAILE] Generado num1 = " << num << " +/- " << mov[LU] << endl;
     int atras = rand()%2;
 
     if (atras && TOPE_MANO_ADELANTE > mov[LU]+num)
@@ -587,8 +587,8 @@ void _lego::bailar() {
     else
         mov[LU] += 1;
     
-    num= (TOPE_CABEZA_ADELANTE +rand()%(TOPE_CABEZA_ATRAS-TOPE_CABEZA_ADELANTE))*0.2;
-    cout << "[BAILE] Generado num2 = " << num << " +/- " << mov[HEAD] << endl;
+    num= (TOPE_CABEZA_ADELANTE +rand()%(TOPE_CABEZA_ATRAS-TOPE_CABEZA_ADELANTE))*0.1;
+    //cout << "[BAILE] Generado num2 = " << num << " +/- " << mov[HEAD] << endl;
     atras = rand()%2;
     if (atras && TOPE_CABEZA_ADELANTE > mov[HEAD]+num)
         mov[HEAD] += num;
@@ -596,6 +596,26 @@ void _lego::bailar() {
         mov[HEAD] -= num;
     else
         mov[HEAD] += 1;
+
+    num= (TOPE_MANO_ADELANTE +rand()%(TOPE_MANO_ADELANTE-TOPE_MANO_ATRAS))*0.1;
+    //cout << "[BAILE] Generado num2 = " << num << " +/- " << mov[HEAD] << endl;
+    atras = rand()%2;
+    if (atras && TOPE_MANO_ADELANTE > mov[RHAND]+num)
+        mov[RHAND] += num;
+    else if (TOPE_MANO_ATRAS < mov[HEAD]-num)
+        mov[RHAND] -= num;
+    else
+        mov[RHAND] += 1;
+    
+    num= (TOPE_MANO_ADELANTE +rand()%(TOPE_MANO_ADELANTE-TOPE_MANO_ATRAS))*0.1;
+    //cout << "[BAILE] Generado num2 = " << num << " +/- " << mov[HEAD] << endl;
+    atras = rand()%2;
+    if (atras && TOPE_MANO_ADELANTE > mov[RHAND]+num)
+        mov[LHAND] += num;
+    else if (TOPE_MANO_ATRAS < mov[HEAD]-num)
+        mov[LHAND] -= num;
+    else
+        mov[LHAND] += 1;
     
 
 }
