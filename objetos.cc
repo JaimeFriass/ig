@@ -427,19 +427,38 @@ void colocar(bool reventado) {
     glTranslatef(0,-5.5,0);
 }
 
-_cabeza::_cabeza() {
+_cabeza::_cabeza(char modo) {
     glPushMatrix();
         _ply cabezon;
         glTranslatef(0,-9.3,0); // Traslado al eje
         inicializar();
         cabezon.leer("./lego_ply/cabeza.ply", 0.08);
-        cabezon.draw_aristas(0,0,0,1);
-        cabezon.draw_solido(0.95,0.95,0.05);
+        switch(modo) {
+            case 'p':
+                cabezon.draw_puntos(0,0,0,2);
+                break;
+            case 'l':
+                cabezon.draw_aristas(0,0,0,2);
+                break;
+            case 'f':
+                cabezon.draw_solido(1,0.50,0.9);
+                cabezon.draw_aristas(0,0,0,2);
+                break;
+            case 'c':
+                cabezon.draw_solido_ajedrez(1,0,0,0,1,0);
+                cabezon.draw_aristas(0,0,0,2);
+                break;
+            default:
+                cabezon.draw_aristas(0,0,0,1);
+                cabezon.draw_solido(0.95,0.95,0.05);
+                break;
+        }
+
     glPopMatrix();
 
 }
 
-_pierna::_pierna() {
+_pierna::_pierna(char modo) {
     
     glPushMatrix();
         _ply pierna;
@@ -448,44 +467,124 @@ _pierna::_pierna() {
         glRotatef(-53, 1, 0, 0);
         inicializar();
         pierna.leer("./lego_ply/pierna.ply", 0.08);
-        pierna.draw_aristas(0,0,0,1);
-        pierna.draw_solido(0.4,0.5,0.2);
+
+        switch(modo) {
+            case 'p':
+                pierna.draw_puntos(0,0,0,2);
+                break;
+            case 'l':
+                pierna.draw_aristas(0,0,0,2);
+                break;
+            case 'f':
+                pierna.draw_solido(1,0.50,0.9);
+                pierna.draw_aristas(0,0,0,2);
+                break;
+            case 'c':
+                pierna.draw_solido_ajedrez(1,0,0,0,1,0);
+                pierna.draw_aristas(0,0,0,2);
+                break;
+            default:
+                pierna.draw_aristas(0,0,0,1);
+                pierna.draw_solido(0.4,0.5,0.2);
+                break;
+        }
+
     glPopMatrix();
 
 }
 
-_mano_izq::_mano_izq() {
+_mano_izq::_mano_izq(char modo) {
     glPushMatrix();
     _ply mano;
     glTranslatef(0,-8.75,-0.1); // Translado al eje
     inicializar();
     mano.leer("./lego_ply/mano_izq.ply", 0.08);
-    mano.draw_aristas(0,0,0,1);
-    mano.draw_solido(0.95,0.95,0.05);
+        switch(modo) {
+            default:
+                mano.draw_aristas(0,0,0,1);
+                mano.draw_solido(0.95,0.95,0.05);
+                break;
+            case 'p':
+                mano.draw_puntos(0,0,0,2);
+                break;
+            case 'l':
+                mano.draw_aristas(0,0,0,2);
+                break;
+            case 'f':
+                mano.draw_solido(1,0.50,0.9);
+                mano.draw_aristas(0,0,0,2);
+                break;
+            case 'c':
+                mano.draw_solido_ajedrez(1,0,0,0,1,0);
+                mano.draw_aristas(0,0,0,2);
+                break;
+
+        }
+
+
     glPopMatrix();
 
 }
 
-_mano_der::_mano_der() {
+_mano_der::_mano_der(char modo) {
     glPushMatrix();
 
     _ply mano;
     glTranslatef(0,-8.75,-0.1); // Translado al eje
     inicializar();
     mano.leer("./lego_ply/mano_der.ply", 0.08);
-    mano.draw_aristas(0,0,0,1);
-    mano.draw_solido(0.95,0.95,0.05);
+        switch(modo) {
+            default:
+                mano.draw_aristas(0,0,0,1);
+                mano.draw_solido(0.95,0.95,0.05);
+                break;
+            case 'p':
+                mano.draw_puntos(0,0,0,2);
+                break;
+            case 'l':
+                mano.draw_aristas(0,0,0,2);
+                break;
+            case 'f':
+                mano.draw_solido(1,0.50,0.9);
+                mano.draw_aristas(0,0,0,2);
+                break;
+            case 'c':
+                mano.draw_solido_ajedrez(1,0,0,0,1,0);
+                mano.draw_aristas(0,0,0,2);
+                break;
+
+        }
     glPopMatrix();
 
 }
 
-_pecho::_pecho() {
+_pecho::_pecho(char modo) {
     glPushMatrix();
     _ply pecho;
     inicializar();
     pecho.leer("./lego_ply/pecho.ply", 0.08);
-    pecho.draw_aristas(0,0,0,1);
-    pecho.draw_solido(0.4,1,0.2);
+        switch(modo) {
+            default:
+                pecho.draw_aristas(0,0,0,1);
+                pecho.draw_solido(0.4,1,0.2);
+                break;
+            case 'p':
+                pecho.draw_puntos(0,0,0,2);
+                break;
+            case 'l':
+                pecho.draw_aristas(0,0,0,2);
+                break;
+            case 'f':
+                pecho.draw_solido(1,0.50,0.9);
+                pecho.draw_aristas(0,0,0,2);
+                break;
+            case 'c':
+                pecho.draw_solido_ajedrez(1,0,0,0,1,0);
+                pecho.draw_aristas(0,0,0,2);
+                break;
+
+        }
+
     glPopMatrix();
 }
 
@@ -502,7 +601,7 @@ _lego::_lego() {
 ///////////////////////////////////////////////////////////
 //                         DRAW LEGO
 
-void _lego::draw() {
+void _lego::draw(char modo) {
     if (baile)
         bailar();
 
@@ -514,7 +613,7 @@ void _lego::draw() {
         // PECHO
         glPushMatrix();
             colocar(reventado);
-            _pecho *pechamen = new _pecho;
+            _pecho *pechamen = new _pecho(modo);
         glPopMatrix();
 
         // CABEZA
@@ -523,7 +622,7 @@ void _lego::draw() {
             glTranslatef(0,9.3,0); // Traslado al eje inverso
             glRotatef(head,1,0,0); // Movimiento
             glPushMatrix();
-                _cabeza *cabezon = new _cabeza;
+                _cabeza *cabezon = new _cabeza(modo);
             glPopMatrix();
         glPopMatrix();
 
@@ -533,7 +632,7 @@ void _lego::draw() {
             glTranslatef(0,8.75,0.1); // Translado al eje inverso
             glRotatef(lhu, 1, 0, 0);
             glPushMatrix();
-                _mano_izq *manoizq = new _mano_izq;
+                _mano_izq *manoizq = new _mano_izq(modo);
             glPopMatrix();
         glPopMatrix();
 
@@ -543,7 +642,7 @@ void _lego::draw() {
             glTranslatef(0,8.75,0.1); // Translado al eje inverso
             glRotatef(rhu, 1, 0 , 0);   // Rotamiento
             glPushMatrix();
-                _mano_der *manoder = new _mano_der;
+                _mano_der *manoder = new _mano_der(modo);
             glPopMatrix();
         glPopMatrix();
 
@@ -553,9 +652,9 @@ void _lego::draw() {
             glTranslatef(0,4.5,-0.2);
             glRotatef(lu, 1, 0, 0);     // Rotamiento
             glPushMatrix();
-                _pierna *pierna1 = new _pierna;
+                _pierna *pierna1 = new _pierna(modo);
                 glTranslatef(-2.6,0,0);
-                _pierna *pierna2 = new _pierna;
+                _pierna *pierna2 = new _pierna(modo);
             glPopMatrix();
         glPopMatrix();
 
@@ -616,7 +715,7 @@ void _lego::bailar() {
         mov[LHAND] -= num;
     else
         mov[LHAND] += 1;
-    
+    usleep(100000);
 
 }
 void _lego::legs_up() {

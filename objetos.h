@@ -7,6 +7,7 @@
 #include "vertex.h"
 #include <stdlib.h>
 #include <math.h>
+#include <unistd.h>
 #include <time.h>
 
 using namespace std;
@@ -151,7 +152,7 @@ class _lego : public _triangulos3D
 	 void legs();
 
 	 // Función principal, se actualizará continuamente.
-	 void draw();
+	 void draw(char modo);
 
 	 GLfloat mov[QUIT];
  };
@@ -159,30 +160,30 @@ class _lego : public _triangulos3D
 class _cabeza : public _ply
 {
 public:
-	_cabeza();
+	_cabeza(char modo);
 	void draw(float r1, float g1, float b1);
 };
 
 class _pierna : public _ply
 {
 public:
-	_pierna();
+	_pierna(char modo);
 };
 
 class _mano_izq : public _ply
 {
 public:
-	_mano_izq();
+	_mano_izq(char modo);
 };
 
 class _mano_der : public _ply
 {
 public:
-	_mano_der();
+	_mano_der(char modo);
 };
 
 class _pecho : public _ply
 {
 public:
-	_pecho();
+	_pecho(char modo);
 };

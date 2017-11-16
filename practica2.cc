@@ -245,8 +245,29 @@ void draw_objects()
 	}
 
 	if (modo == 5) {
+
 		
-		legamen.draw();
+		legamen.draw(teclaPulsada);
+/*
+		switch(teclaPulsada) {
+			default:
+				legamen.draw('a');
+			case 'p':
+				legamen.draw('p');
+				break;
+			case 'l':
+				legamen.draw('l');
+				break;
+			case 'c':
+				legamen.draw('c');
+				break;
+			case 'f':
+				legamen.draw('f');
+				break;
+
+				
+		}
+*/
 
 		//legamen.process_key(teclaPulsada);
 	}
