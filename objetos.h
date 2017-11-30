@@ -41,8 +41,34 @@ class _triangulos3D : public _puntos3D
 	void draw_solido_ajedrez(float r1, float g1, float b1, float r2, float g2, float b2);
 	void draw_aristas_circulos(float radio, float n);
 	void Circle(GLfloat radio, GLfloat cx, GLfloat cy, GLfloat cz, GLint n, GLenum modo);
+	
+	void calcular_normales_vertices();
+	void calcular_normales_caras();
+	void draw_textura(GLuint ident_textura);
+	void draw_iluminacion_suave();
+	void draw_iluminacion_plana();
+	void draw_textura_iluminacion_plana(GLuint ident_textura);
+	void draw_textura_iluminacion_suave(GLuint ident_textura);
 
 	vector<_vertex3i> caras;
+
+	vector<_vertex3f> normales_caras;
+	vector<_vertex3f> normales_vertices;
+	vector<_vertex3f> textura_coord;
+
+	bool b_normales_caras;
+	bool b_normales_vertices;
+	bool b_textura_coord;
+
+	_vertex4f ambiente_difusa = {0.0,0.5,1.0,1.0}; // Coeficientes ambiente y difuso
+	_vertex4f especular =  {0.6,0.6,0.6,1.0};      // Coeficientes especular
+	float brillo=50; 			   // Exponente del brillo
+
+	bool modo_text;            // Generación automática o no de las coords de textura
+	GLfloat plano_s[4];        // Si modo_text=true se usan esttos coeficientes
+	GLfloat plano_t[4];		   //Generación automática de las coords de textura
+	
+
 };
 
 //*************************************************************************

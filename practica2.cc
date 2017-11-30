@@ -33,6 +33,11 @@ _ply objeto("./ply_files/beethoven.ply",1);
 
 _lego legamen;
 
+
+bool iluminacion = false;
+bool textura = false;
+bool plana = true;
+
 // variables que controlan la ventana y la transformacion de perspectiva
 GLfloat Window_width, Window_height, Front_plane, Back_plane;
 
@@ -45,7 +50,7 @@ int UI_window_pos_x = 200, UI_window_pos_y = 50, UI_window_width = 1200, UI_wind
 
 void clear_window()
 {
-
+	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -100,7 +105,14 @@ void draw_axis()
 	glVertex3f(0, 0, AXIS_SIZE);
 	glEnd();
 }
+void luces() {
+	GLfloat light_position[4] = {0,1,1,0};
 
+	glDisable(GL_LIGHT0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+}
 //**************************************************************************
 // Funcion que dibuja los objetos
 //***************************************************************************
@@ -129,9 +141,13 @@ void draw_objects()
 	} else if (teclaPulsada == '5') {
 		modo = 5;
 		//cout << "MODO LEGO\n-------------" << endl;
+	} else if (teclaPulsada == '6') {
+		modo = 6;
 	}
 
 	if (modo == 1) {
+
+
 		lapira.draw_solido(0,1,1);
 		lapira.draw_aristas(0,0,0,2);
 		if (teclaPulsada == 'p')
@@ -144,6 +160,36 @@ void draw_objects()
 		} else if (teclaPulsada == 'c') {
 			lapira.draw_solido_ajedrez(1,0,0,0,1,0);
 			lapira.draw_aristas(0,0,0,2);
+		} else if (teclaPulsada == 'i') {
+
+			if (!iluminacion && plana) {
+				cout << "Iluminación plana activada." << endl;
+				lapira.draw_iluminacion_plana();
+				iluminacion = true;
+
+			} else if (!iluminacion && !plana) {
+				cout << "Iluminación suave activada." << endl;
+				lapira.draw_iluminacion_suave();
+				iluminacion = true;
+
+			}
+			else {
+				iluminacion = false;
+			}
+
+		} else if (teclaPulsada == 't') {
+			if (!textura && plana) {
+				//
+			}
+		} else if (teclaPulsada == 's') {
+			if (!plana) {
+				plana = true;
+				cout << "Suavidad desactivada" << endl;
+			}
+			else {
+				plana = false;
+				cout << "Suavidad activada." << endl;
+			}
 		}
 	}
 	// MODO CUBO
@@ -179,6 +225,36 @@ void draw_objects()
 		} else if (teclaPulsada == 'c') {
 			objeto.draw_solido_ajedrez(1,0,0,0,1,0);
 			objeto.draw_aristas(0,0,0,2);
+		} else if (teclaPulsada == 'i') {
+
+			if (!iluminacion && plana) {
+				cout << "Iluminación plana activada." << endl;
+				objeto.draw_iluminacion_plana();
+				iluminacion = true;
+
+			} else if (!iluminacion && !plana) {
+				cout << "Iluminación suave activada." << endl;
+				objeto.draw_iluminacion_suave();
+				iluminacion = true;
+
+			}
+			else {
+				iluminacion = false;
+			}
+
+		} else if (teclaPulsada == 't') {
+			if (!textura && plana) {
+				//
+			}
+		} else if (teclaPulsada == 's') {
+			if (!plana) {
+				plana = true;
+				cout << "Suavidad desactivada" << endl;
+			}
+			else {
+				plana = false;
+				cout << "Suavidad activada." << endl;
+			}
 		}
 	}
 
@@ -204,6 +280,8 @@ void draw_objects()
 		}
 
 		_revolucion revo(vertices, 50, true, true);
+		revo.draw_solido(0.5,0.5,1);
+		revo.draw_aristas(0,0,0,2);
 		if (teclaPulsada == 'p')
 			revo.draw_puntos(0.9, 0.23, 0.4, 5);
 		else if (teclaPulsada == 'l')
@@ -231,6 +309,8 @@ void draw_objects()
 		}
 
 		_revolucion_inv revo(vertices, 6, true, true);
+		revo.draw_solido(0.5,0.7,1);
+		revo.draw_aristas(0,0,0,2);
 		if (teclaPulsada == 'p')
 			revo.draw_puntos(0.9, 0.23, 0.4, 5);
 		else if (teclaPulsada == 'l')
@@ -244,33 +324,7 @@ void draw_objects()
 		}
 	}
 
-	if (modo == 5) {
-
-		
-		legamen.draw(teclaPulsada);
-/*
-		switch(teclaPulsada) {
-			default:
-				legamen.draw('a');
-			case 'p':
-				legamen.draw('p');
-				break;
-			case 'l':
-				legamen.draw('l');
-				break;
-			case 'c':
-				legamen.draw('c');
-				break;
-			case 'f':
-				legamen.draw('f');
-				break;
-
-				
-		}
-*/
-
-		//legamen.process_key(teclaPulsada);
-	}
+	if (modo == 5) {legamen.draw(teclaPulsada);}
 
 	teclaPulsada = '0';
 	glutPostRedisplay();
@@ -285,8 +339,9 @@ void draw_objects()
 
 void draw_scene(void)
 {
-
+		
 	clear_window();
+	luces();
 	change_observer();
 	draw_axis();
 	draw_objects();
@@ -357,16 +412,39 @@ void special_keys(int Tecla1, int x, int y)
 	case GLUT_KEY_PAGE_DOWN:
 		Observer_distance /= 1.2;
 		break;
-	case GLUT_KEY_F1: legamen.cabeza_atras(); break;
-	case GLUT_KEY_F2: legamen.cabeza_adelante(); break;
-	case GLUT_KEY_F3: legamen.mano_izq_adelante(); break;
-	case GLUT_KEY_F4: legamen.mano_izq_atras(); break;
-	case GLUT_KEY_F5: legamen.mano_der_adelante(); break;
-	case GLUT_KEY_F6: legamen.mano_der_atras(); break;
-	case GLUT_KEY_F7: legamen.legs_up(); break;
-	case GLUT_KEY_F8: legamen.legs_down(); break;
-	case GLUT_KEY_F9: legamen.alternar_baile(); break;
-	case GLUT_KEY_F10:legamen.alternar_reventado(); break;
+	}
+
+	if (modo == 3) {
+		switch (Tecla1) {
+			case GLUT_KEY_F1: objeto.draw_iluminacion_plana(); break;
+			case GLUT_KEY_F2: objeto.draw_iluminacion_suave(); break;
+			case GLUT_KEY_F3: objeto.draw_textura_iluminacion_plana(0); break;
+			case GLUT_KEY_F4: objeto.draw_textura_iluminacion_suave(0); break;
+		}
+	}
+
+	if (modo == 2) {
+		switch (Tecla1) {
+			case GLUT_KEY_F1: elcubo.draw_iluminacion_plana(); break;
+			case GLUT_KEY_F2: elcubo.draw_iluminacion_suave(); break;
+			case GLUT_KEY_F3: elcubo.draw_textura_iluminacion_plana(0); break;
+			case GLUT_KEY_F4: elcubo.draw_textura_iluminacion_suave(0); break;
+		}
+	}
+
+	if (modo == 5) {
+		switch (Tecla1){
+			case GLUT_KEY_F1: legamen.cabeza_atras(); break;
+			case GLUT_KEY_F2: legamen.cabeza_adelante(); break;
+			case GLUT_KEY_F3: legamen.mano_izq_adelante(); break;
+			case GLUT_KEY_F4: legamen.mano_izq_atras(); break;
+			case GLUT_KEY_F5: legamen.mano_der_adelante(); break;
+			case GLUT_KEY_F6: legamen.mano_der_atras(); break;
+			case GLUT_KEY_F7: legamen.legs_up(); break;
+			case GLUT_KEY_F8: legamen.legs_down(); break;
+			case GLUT_KEY_F9: legamen.alternar_baile(); break;
+			case GLUT_KEY_F10:legamen.alternar_reventado(); break;
+		}
 	}
 	glutPostRedisplay();
 }

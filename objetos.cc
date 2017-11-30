@@ -779,4 +779,306 @@ void _lego::cabeza_adelante() {
     }
 }
 
+//////////////////////////////////////////////////
+//           LUCES
+//////////////////////////////////////////////////
 
+// Cálculo de las normales de las caras
+void _triangulos3D::calcular_normales_caras(){
+	normales_caras.resize(caras.size());
+
+	for (unsigned long i = 0; i < caras.size(); i++){
+		// Obtenemos dos vectores en el triángulo y calculamos el producto vectorial
+		_vertex3f a1 = vertices[caras[i]._1] - vertices[caras[i]._0],
+				  a2 = vertices[caras[i]._2] - vertices[caras[i]._0],
+				  n = a1.cross_product(a2);
+		// Módulo
+		float m = sqrt(n.x*n.x + n.y*n.y + n.z*n.z);
+		// Normalizamos
+		normales_caras[i] = _vertex3f(n.x/m, n.y/m, n.z/m);
+	}
+
+	b_normales_caras = true;
+    cout << "[CALCULO NORMALES CARAS]" << endl;
+}
+
+// Cálculo de las normales de los vértices
+void _triangulos3D::calcular_normales_vertices(){
+    
+    if(b_normales_vertices==false){
+        if(b_normales_caras ==false){
+            calcular_normales_caras();
+        }
+        normales_vertices.resize(vertices.size());
+        for(int i =0 ; i< caras.size() ; i++){
+            normales_vertices[caras[i]._0].x += normales_caras[i].x;
+            normales_vertices[caras[i]._0].y += normales_caras[i].y;
+            normales_vertices[caras[i]._0].z += normales_caras[i].z;
+
+            normales_vertices[caras[i]._1].x += normales_caras[i].x;
+            normales_vertices[caras[i]._1].y += normales_caras[i].y;
+            normales_vertices[caras[i]._1].z += normales_caras[i].z;
+
+            normales_vertices[caras[i]._2].x += normales_caras[i].x;
+            normales_vertices[caras[i]._2].y += normales_caras[i].y;
+            normales_vertices[caras[i]._2].z += normales_caras[i].z;
+        }
+    }
+    b_normales_vertices=true;
+    cout << "[CALCULO NORMALES VERTICES]" << endl;
+}
+
+// Dibujar con iluminación y sin suavizado. Terminada
+void _triangulos3D::draw_iluminacion_plana(){
+	int i;
+	GLfloat ambient_component[4]={1,1,1,1};
+
+	if (!b_normales_caras)
+		calcular_normales_caras();
+
+	//glEnable(GL_CULL_FACE);
+	//glLightmOdelfv(GL_LIGHT_MODEL_AMBIENT, ambient_component);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+
+	glShadeModel(GL_FLAT);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *) &ambiente_difusa);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glBegin(GL_TRIANGLES);
+
+	for (i = 0; i < caras.size(); i++){
+		glNormal3fv((GLfloat *) &normales_caras[i]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
+	}
+
+	glEnd();
+	glDisable(GL_LIGHTING);
+	//glDisable(GL_CULL_FACE);
+    cout << "[DRAW ILUMINACION PLANA]" << endl;
+}
+
+// Dibujar con iluminación y con suavizado. Terminada
+void _triangulos3D::draw_iluminacion_suave(){
+	int i;
+	GLfloat ambient_component[4]={1,1,1,1};
+
+	if (!b_normales_vertices)
+		calcular_normales_vertices();
+
+	//glEnable(GL_CULL_FACE);
+	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient_component);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *) &ambiente_difusa);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glBegin(GL_TRIANGLES);
+
+	for (i = 0; i < caras.size(); i++){
+		glNormal3fv((GLfloat *) &normales_vertices[caras[i]._0]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+		glNormal3fv((GLfloat *) &normales_vertices[caras[i]._1]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+		glNormal3fv((GLfloat *) &normales_vertices[caras[i]._2]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
+	}
+
+	glEnd();
+	glDisable(GL_LIGHTING);
+	//glDisable(GL_CULL_FACE);
+    cout << "[DRAW ILUMINACION SUAVE]" << endl;
+}
+
+
+void _triangulos3D::draw_textura(GLuint ident_textura) {
+    // Activación de la textura
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, ident_textura);
+    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (modo_text == true) {
+        glEnable(GL_TEXTURE_GEN_S);
+        glEnable(GL_TEXTURE_GEN_T);
+        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+        glTexGenfv(GL_S, GL_EYE_PLANE, plano_s);
+        glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+        glTexGenfv(GL_T, GL_EYE_PLANE, plano_t);
+    }
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glBegin(GL_TRIANGLES);
+    for (int i = 0; i < caras.size(); i++) {
+        glNormal3fv((GLfloat *) &normales_caras[i]);
+        if (b_textura_coord == true)
+            glTexCoord2f(textura_coord[caras[i]._0].s, textura_coord[caras[i]._0].t);
+        glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+        if (b_textura_coord == true)
+            glTexCoord2f(textura_coord[caras[i]._1].s, textura_coord[caras[i]._1].t);
+        glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+        if (b_textura_coord == true)
+            glTexCoord2f(textura_coord[caras[i]._2].s, textura_coord[caras[i]._2].s);
+        glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
+    }
+
+
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_GEN_S);
+    glDisable(GL_TEXTURE_GEN_T);
+    glEnable(GL_LIGHTING);
+}
+// Dibujar con textura, iluminación y SIN suavizado
+void _triangulos3D::draw_textura_iluminacion_plana(GLuint ident_textura) {
+    GLfloat material_blanco[4] = {1,1,1,1};
+
+    if (b_normales_caras == false) calcular_normales_caras();
+    // Activar iluminación
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+    glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+    
+    glShadeModel(GL_FLAT);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_NORMALIZE);
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material_blanco);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo);
+
+    // Activación de la textura
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, ident_textura); // Vínculo con la textura
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (modo_text == true) {
+        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+        glTexGenfv(GL_S, GL_EYE_PLANE, plano_s);
+        glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+        glTexGenfv(GL_T, GL_EYE_PLANE, plano_t);
+    }
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glBegin(GL_TRIANGLES);
+    for (int i = 0; i < caras.size(); i++) {
+        glNormal3fv((GLfloat *) &normales_caras[i]);
+        if (b_textura_coord == true)
+            glTexCoord2f(textura_coord[caras[i]._0].s, textura_coord[caras[i]._0].t);
+        glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+        if (b_textura_coord == true)
+            glTexCoord2f(textura_coord[caras[i]._1].s, textura_coord[caras[i]._1].t);
+        glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+        if (b_textura_coord == true)
+            glTexCoord2f(textura_coord[caras[i]._2].s, textura_coord[caras[i]._2].t);
+        glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
+
+    }
+    
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_GEN_S);
+    glDisable(GL_TEXTURE_GEN_T);
+    glEnable(GL_LIGHTING);
+}
+
+// Dibujar con textura, iluminación y suavizado
+
+void _triangulos3D::draw_textura_iluminacion_suave(GLuint ident_textura){
+	GLfloat material_blanco[4]={1.0, 1.0, 1.0, 1};
+
+	if (!b_normales_vertices) 
+		calcular_normales_vertices();
+
+	// Activación de iluminación
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+	glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material_blanco);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo);
+
+	// activación de la textura
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, ident_textura);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// generación automática de texturas
+	if (modo_text){
+		glEnable(GL_TEXTURE_GEN_S);
+		glEnable(GL_TEXTURE_GEN_T);
+		glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+		glTexGenfv(GL_S, GL_OBJECT_PLANE, plano_s);
+		glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+		glTexGenfv(GL_T, GL_OBJECT_PLANE, plano_t);
+	}
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glBegin(GL_TRIANGLES);
+	
+	for (int i = 0; i < caras.size(); i++){
+		glNormal3fv((GLfloat *) &normales_vertices[caras[i]._0]);
+		
+		if (b_textura_coord)
+			glTexCoord2f(textura_coord[caras[i]._0].s, textura_coord[caras[i]._0].t);
+		
+		glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+		glNormal3fv((GLfloat *) &normales_vertices[caras[i]._1]);
+
+		if (b_textura_coord)
+			glTexCoord2f(textura_coord[caras[i]._1].s, textura_coord[caras[i]._1].t);
+
+		glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+		glNormal3fv((GLfloat *) &normales_vertices[caras[i]._2]);
+
+		if (b_textura_coord)
+			glTexCoord2f(textura_coord[caras[i]._2].s, textura_coord[caras[i]._2].t);
+
+		glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
+	}
+
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glEnable(GL_LIGHTING);
+}
+
+
+// textura
+/*
+void tablero_textura(float lado, int n) {
+    int i,j;
+    glPolyGonMode(GL_FRONT_AND_BACK, GL_FILL)
+
+    for (i = 0; i < n; i++)
+        for (j = 0; j < n; j++) {
+            glBegin(GL_POLYGON);
+                glTexCoor2d()
+                glVertex3f(j*lado/(1.0*n),i*lado/(1.0*n), 0.0);
+
+            glEnd();
+    }
+}
+*/
