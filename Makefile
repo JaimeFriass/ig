@@ -16,7 +16,7 @@ CXXFLAGS=  -std=c++11 -g -DXWINDOWS -DSHM -I/usr/include -I.
 # Se indica directorios donde encontrar las funciontecas con -L. Usando -l seguido del
 # nombre se indica la funcionteca que se desea enlazar.
 #
-LDFLAGS=  -lGLU -lGL -lglut -lm
+LDFLAGS=  -lGLU -lGL -lglut -lX11 -L/usr/X11R6/lib
 
 # definicion del compilador
 #

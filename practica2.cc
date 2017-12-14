@@ -12,13 +12,19 @@
 #include <ctype.h>
 #include<time.h>
 #include <objetos.h>
+#include "CImg.h"
+using namespace cimg_library;
 
 // tamaño de los ejes
 const int AXIS_SIZE = 5000;
 char teclaPulsada;
-int modo;
-int figura;
+
+int modo = 4;
+int figura = 0;
 int material = 0;
+int modelo = 0;
+
+string archivoTex = "./meninas.jpg";
 
 // variables que definen la posicion de la camara en coordenadas polares
 GLfloat Observer_distance;
@@ -33,7 +39,8 @@ _triangulos3D triangulo();
 
 _piramide lapira(5,7);
 _cubo elcubo(5);
-_ply objeto("./ply_files/beethoven.ply",1);
+_tablero tablo;
+//_ply objeto("./ply_files/beethoven.ply",1);
 //_revolucion_inv revo(vertices, 6, true, true);
 
 _lego legamen;
@@ -135,138 +142,147 @@ void luces() {
 		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	glPopMatrix();
 }
+//**********************************************************************
+// Funcion para cargar la textura
+//***********************************************************************
+
+GLuint textura_id;
+
+void prepara_textura(void){
+  vector<unsigned char> data;
+  CImg<unsigned char> logo;
+
+  logo.load(archivoTex.c_str());
+
+  // empaquetamos bien los datos
+  for (long y = 0; y < logo.height(); y++){
+    for (long x = 0; x < logo.width(); x++){
+      unsigned char *r = logo.data(x, y, 0, 0);
+      unsigned char *g = logo.data(x, y, 0, 1);
+      unsigned char *b = logo.data(x, y, 0, 2);
+      data.push_back(*r);
+      data.push_back(*g);
+      data.push_back(*b);
+    }
+  }
+
+  glGenTextures(1, &textura_id);
+  glBindTexture(GL_TEXTURE_2D, textura_id);
+
+  glActiveTexture(GL_TEXTURE0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  // TRASFIERE LOS DATOS A GPU
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, logo.width(), logo.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, &data[0]);
+}
+
+string materialToString(const int &material) {
+	string mat;
+	switch (material) {
+		case 0: mat="BRASS"; break;
+		case 1: mat="BRONZE"; break;
+		case 2: mat="POLISHED BRONZE"; break;
+		case 3: mat="CHROME"; break;
+		case 4: mat="COPPER"; break;
+		case 5: mat="POLISHED COPPER"; break;
+		case 6: mat="GOLD"; break;
+		case 7: mat="POLISHED GOLD"; break;
+		case 8: mat="SILVER"; break;
+		case 9: mat="POLISHED SILVER"; break;
+		case 10: mat="EMERALD"; break;
+		case 11: mat="JADE"; break;
+		case 12: mat="OBSIDIAN"; break;
+		case 13: mat="PEARL"; break;
+		case 14: mat="RUBY"; break;
+		case 15: mat="TURQUOISE"; break;
+		case 16: mat="BLACK PLASTIC"; break;
+		case 17: mat="BLACK RUBBER"; break; 
+		default: mat="INDEFINIDO"; break;
+	}
+	return mat;
+}
+
+string figuraToString(const int &figura) {
+	string fig;
+	switch (figura) {
+		case 1: fig="PIRAMIDE"; break;
+		case 2: fig="CUBO"; break;
+		case 3: fig="PLY"; break;
+		case 4: fig="REVOLUCION"; break;
+		case 5: fig="LEGO"; break;
+		case 6: fig="TABLERO"; break;
+		default: fig="INDEFINIDO"; break;
+	}
+	return fig;
+}
+
+string modoToString(const int &modo) {
+	string mod;
+	switch (modo) {
+		case 1: mod="PUNTOS"; break;
+		case 2: mod="ARISTAS"; break;
+		case 3: mod="SOLIDO"; break;
+		case 4: mod="AJEDREZ"; break;
+		case 5: mod="ILUMINACION PLANA"; break;
+		case 6: mod="ILUMINACION SUAVE"; break;
+		case 7: mod="TEXTURA"; break;
+		default: mod="INDEFINIDO"; break;
+	}
+	return mod;
+}
 //**************************************************************************
 // Funcion que dibuja los objetos
 //***************************************************************************
 
 void draw_objects()
 {
+		string local;
+		if (figura == 3) {
+			switch(modelo){
+				case 0: local="./ply_files/beethoven.ply"; break;
+				case 1: local="./ply_files/ant.ply"; break;
+				case 2: local="./ply_files/big_dodge.ply"; break;
+				case 3: local="./ply_files/16.ply"; break;
+				case 4: local="./ply_files/london.ply"; break;
+				case 5: local="./ply_files/vespa.ply"; break;
+				case 6: local="./ply_files/warthog.ply"; break;
+				case 7: local="./ply_files/laptop.ply"; break;
+				default: local="./ply_files/beethoven.ply"; break;
+			}
+		}
+		_ply objeto(local,1);
+
 	
+	cout << "\n\n\n\n\n\n\n|*|------------- PRACTICA 4 - ILUMINACION -------------|*|\n" <<
+		    "   Figuras: |1|Piramide  |2|Cubo  |3|Ply  |4|Revolucion |5|LEGO\n" << 
+			"   Modos de dibujado: \n" <<
+			"   |p|Puntos   |l|Aristas    |f|Solido   |c|Ajedrez      \n" <<
+			"   |i|Iluminacion plana      |s|Iluminacion suave\n" <<
+			"\n"
+			"   Figura actual: " << figuraToString(figura) << "\n"
+			"   Modo actual: " << modoToString(modo) << "\n" <<
+			"\n" << endl;
+			if (modo == 5 || modo == 6) {
+	cout << "   |8|Cambiar material           |9||0|Rotar luz movil\n\n";
+	cout << "   Material actual (iluminacion): " << materialToString(material) << "\n";
+			} else {
+	cout << "\n\n\n";
+			}
+	cout << "|*|----------------------------------------------------|*|" << endl;
 
 	switch(figura) {
 		case 1: lapira.draw(modo, material); break;
 		case 2: elcubo.draw(modo, material); break;
 		case 3: objeto.draw(modo, material); break;
 		//case 4: revo.draw(modo, material); break;
-		case 5: legamen.draw(modo); break;
+		case 5: legamen.draw(modo, material); break;
+		case 6: prepara_textura(); tablo.draw_tablero(20,300, textura_id, true); break;
 	}
-
-	/// Selecciona el modo / objeto
-	/*
-	switch(teclaPulsada) {
-		case '1': modo = 1; break;
-		case '2': modo = 2; break;
-		case '3': modo = 3; break;
-		case '4': modo = 4; break;
-		case '5': modo = 5; break;
-		case '6': modo = 6; break;
-	}
-
-	*/
-	/*
+/*
 	switch (modo) {
-		case 1: {
-				lapira.draw_solido(0,1,1);
-				lapira.draw_aristas(0,0,0,2);
-				if (teclaPulsada == 'p')
-					lapira.draw_puntos(1, 0, 0, 10);
-				else if (teclaPulsada ==  'l')
-					lapira.draw_aristas(0, 0, 0, 2);
-				else if (teclaPulsada == 'f') {
-					lapira.draw_solido(0,1,0);
-					lapira.draw_aristas(0,0,0,2);
-				} else if (teclaPulsada == 'c') {
-					lapira.draw_solido_ajedrez(1,0,0,0,1,0);
-					lapira.draw_aristas(0,0,0,2);
-				} else if (teclaPulsada == 'i') {
-
-					if (!iluminacion && plana) {
-						cout << "Iluminación plana activada." << endl;
-						lapira.draw_iluminacion_plana();
-						iluminacion = true;
-
-					} else if (!iluminacion && !plana) {
-						cout << "Iluminación suave activada." << endl;
-						lapira.draw_iluminacion_suave();
-						iluminacion = true;
-
-					}
-					else {
-						iluminacion = false;
-					}
-
-				} else if (teclaPulsada == 't') {
-					if (!textura && plana) {
-						//
-					}
-				} else if (teclaPulsada == 's') {
-					if (!plana) {
-						plana = true;
-						cout << "Suavidad desactivada" << endl;
-					}
-					else {
-						plana = false;
-						cout << "Suavidad activada." << endl;
-					}
-				}
-				break;
-				}
-		case 2: {
-			elcubo.draw_solido(1,1,1);
-			elcubo.draw_aristas(0, 0, 0, 2);
-			if (teclaPulsada == 'p')
-				elcubo.draw_puntos(0.9, 0.23, 0.4, 1);
-			else if (teclaPulsada ==  'l')
-				elcubo.draw_aristas(0.01, 0.52, 0.2, 3);
-			else if (teclaPulsada == 'f') {
-				elcubo.draw_solido(0,1,1);
-				elcubo.draw_aristas(0,0,0,2);
-			} else if (teclaPulsada == 'c') {
-				elcubo.draw_solido_ajedrez(1,0,0,0,1,0);
-				elcubo.draw_aristas(0,0,0,2);
-			}
-			break;
-			}
-		
-
-		case 3: {
-			switch (teclaPulsada) {
-				case 'p': objeto.draw_puntos(0.9, 0.23, 0.4, 1); break;
-				case 'l': objeto.draw_aristas(0, 0, 0, 2); break;
-				case 'f': objeto.draw_solido(0.142, 0.01, 1);
-						  objeto.draw_aristas(0, 0, 0, 2); break;
-				case 'c': objeto.draw_solido_ajedrez(1,0,0,0,1,0);
-						  objeto.draw_aristas(0,0,0,2); break;
-				case 'i':
-					if (!iluminacion && plana) {
-						cout << "Iluminación plana activada." << endl;
-						objeto.draw_iluminacion_plana();
-						iluminacion = true;
-
-					} else if (!iluminacion && !plana) {
-						cout << "Iluminación suave activada." << endl;
-						objeto.draw_iluminacion_suave();
-						iluminacion = true;
-
-					}
-					else {
-						iluminacion = false;
-					}
-					break;
-				case 's':
-					if (!plana) {
-						plana = true;
-						cout << "Suavidad desactivada" << endl;
-					}
-					else {
-						plana = false;
-						cout << "Suavidad activada." << endl;
-					}
-					break;
-			}
-			break;
-			}
-
 		case 6: {
 			vector<_vertex3f> vertices;
 			vertices.resize(11);
@@ -399,12 +415,13 @@ void normal_keys(unsigned char Tecla1, int x, int y)
 		case '3': figura = 3; break;
 		case '4': figura = 4; break;
 		case '5': figura = 5; break;
+		case '6': figura = 6; break;
 
 		case '9':
 			alfa = alfa - 5; break;
 		case '0':
 			alfa = alfa + 5; break;
-
+		case '7': modelo = (modelo+1)%8;
 		case '8': material = (material+1)%18; 
 		break;
 	}
@@ -443,30 +460,6 @@ void special_keys(int Tecla1, int x, int y)
 	case GLUT_KEY_PAGE_DOWN:
 		Observer_distance /= 1.2;
 		break;
-	}
-
-	if (modo == 3) {
-		switch (Tecla1) {
-			case GLUT_KEY_F1: 
-							objeto.draw_solido(0.142, 0.01, 1);
-				objeto.draw_aristas(0,0,0,1); 
-				objeto.draw_iluminacion_plana(material);
-
-				cout << "ASDIJADSJADSDA" << endl;
-			break;
-			case GLUT_KEY_F2: objeto.draw_iluminacion_suave(material); break;
-			case GLUT_KEY_F3: objeto.draw_textura_iluminacion_plana(0); break;
-			case GLUT_KEY_F4: objeto.draw_textura_iluminacion_suave(0); break;
-		}
-	}
-
-	if (modo == 2) {
-		switch (Tecla1) {
-			case GLUT_KEY_F1: elcubo.draw_iluminacion_plana(material); break;
-			case GLUT_KEY_F2: elcubo.draw_iluminacion_suave(material); break;
-			case GLUT_KEY_F3: elcubo.draw_textura_iluminacion_plana(0); break;
-			case GLUT_KEY_F4: elcubo.draw_textura_iluminacion_suave(0); break;
-		}
 	}
 
 	if (modo == 5) {

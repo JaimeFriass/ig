@@ -14,7 +14,6 @@ void _puntos3D::draw_puntos(float r, float g, float b, int grosor) {
     glPointSize(grosor);
     glColor3f(r,g,b);
     glBegin(GL_POINTS);
-    cout << "Se dibujarán " << vertices.size() << " puntos." << endl;
         for (int i=0; i < vertices.size(); i++) {
             glVertex3f(vertices[i].x, vertices[i].y, vertices[i].z);
         }
@@ -427,27 +426,31 @@ void colocar(bool reventado) {
     glTranslatef(0,-5.5,0);
 }
 
-_cabeza::_cabeza(char modo) {
+_cabeza::_cabeza(const int &modo, const int &material) {
     glPushMatrix();
         _ply cabezon;
         glTranslatef(0,-9.3,0); // Traslado al eje
         inicializar();
         cabezon.leer("./lego_ply/cabeza.ply", 0.08);
         switch(modo) {
-            case 'p':
-                cabezon.draw_puntos(0,0,0,2);
+            case 1:
+                cabezon.draw_puntos(0,0,0,5);
                 break;
-            case 'l':
+            case 2:
                 cabezon.draw_aristas(0,0,0,2);
                 break;
-            case 'f':
+            case 3:
                 cabezon.draw_solido(1,0.50,0.9);
                 cabezon.draw_aristas(0,0,0,2);
                 break;
-            case 'c':
+            case 4:
                 cabezon.draw_solido_ajedrez(1,0,0,0,1,0);
                 cabezon.draw_aristas(0,0,0,2);
                 break;
+            case 5:
+                cabezon.draw_iluminacion_plana(material); break;
+            case 6:
+                cabezon.draw_iluminacion_suave(material); break;
             default:
                 cabezon.draw_aristas(0,0,0,1);
                 cabezon.draw_solido(0.95,0.95,0.05);
@@ -458,7 +461,7 @@ _cabeza::_cabeza(char modo) {
 
 }
 
-_pierna::_pierna(char modo) {
+_pierna::_pierna(const int &modo, const int &material) {
     
     glPushMatrix();
         _ply pierna;
@@ -469,20 +472,24 @@ _pierna::_pierna(char modo) {
         pierna.leer("./lego_ply/pierna.ply", 0.08);
 
         switch(modo) {
-            case 'p':
+            case 1:
                 pierna.draw_puntos(0,0,0,2);
                 break;
-            case 'l':
+            case 2:
                 pierna.draw_aristas(0,0,0,2);
                 break;
-            case 'f':
+            case 3:
                 pierna.draw_solido(1,0.50,0.9);
                 pierna.draw_aristas(0,0,0,2);
                 break;
-            case 'c':
+            case 4:
                 pierna.draw_solido_ajedrez(1,0,0,0,1,0);
                 pierna.draw_aristas(0,0,0,2);
                 break;
+            case 5:
+                pierna.draw_iluminacion_plana(material); break;
+            case 6:
+                pierna.draw_iluminacion_suave(material); break;
             default:
                 pierna.draw_aristas(0,0,0,1);
                 pierna.draw_solido(0.4,0.5,0.2);
@@ -493,7 +500,7 @@ _pierna::_pierna(char modo) {
 
 }
 
-_mano_izq::_mano_izq(char modo) {
+_mano_izq::_mano_izq(const int &modo, const int &material) {
     glPushMatrix();
     _ply mano;
     glTranslatef(0,-8.75,-0.1); // Translado al eje
@@ -504,20 +511,23 @@ _mano_izq::_mano_izq(char modo) {
                 mano.draw_aristas(0,0,0,1);
                 mano.draw_solido(0.95,0.95,0.05);
                 break;
-            case 'p':
+            case 1:
                 mano.draw_puntos(0,0,0,2);
                 break;
-            case 'l':
+            case 2:
                 mano.draw_aristas(0,0,0,2);
                 break;
-            case 'f':
+            case 3:
                 mano.draw_solido(1,0.50,0.9);
                 mano.draw_aristas(0,0,0,2);
                 break;
-            case 'c':
+            case 4:
                 mano.draw_solido_ajedrez(1,0,0,0,1,0);
-                mano.draw_aristas(0,0,0,2);
-                break;
+                mano.draw_aristas(0,0,0,2); break;
+            case 5:
+                mano.draw_iluminacion_plana(material); break;
+            case 6:
+                mano.draw_textura_iluminacion_suave(material); break;
 
         }
 
@@ -526,65 +536,39 @@ _mano_izq::_mano_izq(char modo) {
 
 }
 
-_mano_der::_mano_der(char modo) {
+_mano_der::_mano_der(const int &modo, const int &material) {
     glPushMatrix();
-
     _ply mano;
     glTranslatef(0,-8.75,-0.1); // Translado al eje
     inicializar();
     mano.leer("./lego_ply/mano_der.ply", 0.08);
         switch(modo) {
-            default:
-                mano.draw_aristas(0,0,0,1);
-                mano.draw_solido(0.95,0.95,0.05);
-                break;
-            case 'p':
-                mano.draw_puntos(0,0,0,2);
-                break;
-            case 'l':
-                mano.draw_aristas(0,0,0,2);
-                break;
-            case 'f':
-                mano.draw_solido(1,0.50,0.9);
-                mano.draw_aristas(0,0,0,2);
-                break;
-            case 'c':
-                mano.draw_solido_ajedrez(1,0,0,0,1,0);
-                mano.draw_aristas(0,0,0,2);
-                break;
-
+            default: mano.draw_aristas(0,0,0,1); mano.draw_solido(0.95,0.95,0.05); break;
+            case 1: mano.draw_puntos(0,0,0,2); break;
+            case 2: mano.draw_aristas(0,0,0,2); break;
+            case 3: mano.draw_solido(1,0.50,0.9); mano.draw_aristas(0,0,0,2); break;
+            case 4: mano.draw_solido_ajedrez(1,0,0,0,1,0); mano.draw_aristas(0,0,0,2); break;
+            case 5: mano.draw_iluminacion_plana(material); break;
+            case 6: mano.draw_iluminacion_suave(material); break;
         }
     glPopMatrix();
 
 }
 
-_pecho::_pecho(char modo) {
+_pecho::_pecho(const int &modo, const int &material) {
     glPushMatrix();
     _ply pecho;
     inicializar();
     pecho.leer("./lego_ply/pecho.ply", 0.08);
         switch(modo) {
-            default:
-                pecho.draw_aristas(0,0,0,1);
-                pecho.draw_solido(0.4,1,0.2);
-                break;
-            case 'p':
-                pecho.draw_puntos(0,0,0,2);
-                break;
-            case 'l':
-                pecho.draw_aristas(0,0,0,2);
-                break;
-            case 'f':
-                pecho.draw_solido(1,0.50,0.9);
-                pecho.draw_aristas(0,0,0,2);
-                break;
-            case 'c':
-                pecho.draw_solido_ajedrez(1,0,0,0,1,0);
-                pecho.draw_aristas(0,0,0,2);
-                break;
-
+            default: pecho.draw_aristas(0,0,0,1); pecho.draw_solido(0.4,1,0.2); break;
+            case 1: pecho.draw_puntos(0,0,0,2); break;
+            case 2: pecho.draw_aristas(0,0,0,2); break;
+            case 3: pecho.draw_solido(1,0.50,0.9); pecho.draw_aristas(0,0,0,2); break;
+            case 4: pecho.draw_solido_ajedrez(1,0,0,0,1,0); pecho.draw_aristas(0,0,0,2); break;
+            case 5: pecho.draw_iluminacion_plana(material); break;
+            case 6: pecho.draw_iluminacion_suave(material); break;
         }
-
     glPopMatrix();
 }
 
@@ -601,7 +585,7 @@ _lego::_lego() {
 ///////////////////////////////////////////////////////////
 //                         DRAW LEGO
 
-void _lego::draw(char modo) {
+void _lego::draw(const int &modo, const int &material) {
     if (baile)
         bailar();
 
@@ -613,7 +597,7 @@ void _lego::draw(char modo) {
         // PECHO
         glPushMatrix();
             colocar(reventado);
-            _pecho *pechamen = new _pecho(modo);
+            _pecho *pechamen = new _pecho(modo, material);
         glPopMatrix();
 
         // CABEZA
@@ -622,7 +606,7 @@ void _lego::draw(char modo) {
             glTranslatef(0,9.3,0); // Traslado al eje inverso
             glRotatef(head,1,0,0); // Movimiento
             glPushMatrix();
-                _cabeza *cabezon = new _cabeza(modo);
+                _cabeza *cabezon = new _cabeza(modo, material);
             glPopMatrix();
         glPopMatrix();
 
@@ -632,7 +616,7 @@ void _lego::draw(char modo) {
             glTranslatef(0,8.75,0.1); // Translado al eje inverso
             glRotatef(lhu, 1, 0, 0);
             glPushMatrix();
-                _mano_izq *manoizq = new _mano_izq(modo);
+                _mano_izq *manoizq = new _mano_izq(modo, material);
             glPopMatrix();
         glPopMatrix();
 
@@ -642,7 +626,7 @@ void _lego::draw(char modo) {
             glTranslatef(0,8.75,0.1); // Translado al eje inverso
             glRotatef(rhu, 1, 0 , 0);   // Rotamiento
             glPushMatrix();
-                _mano_der *manoder = new _mano_der(modo);
+                _mano_der *manoder = new _mano_der(modo, material);
             glPopMatrix();
         glPopMatrix();
 
@@ -652,9 +636,9 @@ void _lego::draw(char modo) {
             glTranslatef(0,4.5,-0.2);
             glRotatef(lu, 1, 0, 0);     // Rotamiento
             glPushMatrix();
-                _pierna *pierna1 = new _pierna(modo);
+                _pierna *pierna1 = new _pierna(modo, material);
                 glTranslatef(-2.6,0,0);
-                _pierna *pierna2 = new _pierna(modo);
+                _pierna *pierna2 = new _pierna(modo, material);
             glPopMatrix();
         glPopMatrix();
 
@@ -723,18 +707,12 @@ void _lego::bailar() {
 void _lego::legs_up() {
     if (mov[LU] < TOPE_PIES_ADELANTE) {
         mov[LU] += 3;
-        cout << "Piernas arriba. mov[LU] = "<< mov[LU] << endl;
-    } else {
-        cout << "Limite de piernas adelante." << endl;
     }
 }
 
 void _lego::legs_down() {
     if (mov[LU] > TOPE_PIES_ATRAS) {
         mov[LU] -= 3;
-        cout << "Piernas abajo. mov[LU] = " << mov[LU] << endl;
-    } else {
-        cout << "Limite de piernas atras." << endl;
     }
 }
 
@@ -742,17 +720,12 @@ void _lego::legs_down() {
 void _lego::mano_der_adelante() {
     if (mov[RHAND] < TOPE_MANO_ADELANTE) {
         mov[RHAND] += 3;
-        cout << "Mano derecha arriba. mov[RHAND] = " << mov[RHAND] << endl;
-    } else {
-        cout << "Mano derecha ha llegado al tope de arriba" << endl;
+
     }
 }
 void _lego::mano_der_atras() {
     if (mov[RHAND] > TOPE_MANO_ATRAS) {
         mov[RHAND] -= 3;
-        cout << "Mano derecha abajo. mov[RHAND] = " << mov[RHAND] << endl;
-    } else {
-        cout << "Mano derecha ha llegado al tope de abajo." << endl;
     }
 }
 
@@ -770,9 +743,6 @@ void _lego::mano_izq_atras() {
 void _lego::cabeza_atras() {
     if (mov[HEAD] < TOPE_CABEZA_ADELANTE) {
         mov[HEAD] += 3;
-        cout << "CABEZA ARRIBA:" << mov[HEAD] << endl;
-    } else {
-        cout << "Cabeza arriba ha llegado al tope";
     }
 }
 void _lego::cabeza_adelante() {
@@ -800,6 +770,7 @@ void _triangulos3D::draw(const int &modo, const int &material) {
     }
 }
 // Cálculo de las normales de las caras
+/*
 void _triangulos3D::calcular_normales_caras(){
 	normales_caras.resize(caras.size());
 
@@ -817,7 +788,48 @@ void _triangulos3D::calcular_normales_caras(){
 	b_normales_caras = true;
 }
 
+*/
+
+// RUIDO NORMAL
+int nrand;
+float ga, gf;
+void initgauss() {
+    nrand = 4;
+    ga=sqrt(3.0*nrand);
+    gf = 2*ga/(RAND_MAX*1.0);
+    srandom(3);
+}
+
+float gauss() {
+    float sum;
+    int i;
+    sum = 0.0;
+    for (i=0; i < nrand; i++) sum = sum + random();
+    return gf*sum/nrand-ga;
+}
+void    _triangulos3D::calcular_normales_caras(){
+    initgauss(); 
+    for(int i =0 ; i < caras.size() ; i++){ 
+        _vertex3f vector1(vertices[caras[i]._1].x*gauss() - vertices[caras[i]._0].x, 
+                        vertices[caras[i]._1].y*gauss() - vertices[caras[i]._0].y, 
+                        vertices[caras[i]._1].z*gauss() - vertices[caras[i]._0].z); 
+ 
+        _vertex3f vector2(vertices[caras[i]._2].x*gauss() - vertices[caras[i]._0].x, 
+                        vertices[caras[i]._2].y*gauss() - vertices[caras[i]._0].y, 
+                        vertices[caras[i]._2].z*gauss() - vertices[caras[i]._0].z); 
+         
+        _vertex3f normal( (vector1.y*vector2.z)*gauss() - (vector1.z*vector2.y), 
+                        (vector1.y*vector2.x)*gauss() - (vector1.x*vector2.z), 
+                        (vector1.x*vector2.y)*gauss() - (vector1.y*vector2.x)); 
+        normales_caras.push_back(normal); 
+             
+    } 
+    b_normales_caras=true; 
+}
+
 // Cálculo de las normales de los vértices
+
+
 void _triangulos3D::calcular_normales_vertices(){
     
     if(b_normales_vertices==false){
@@ -915,7 +927,7 @@ void _triangulos3D::draw_iluminacion_suave(const int &material){
 	glEnd();
 	glDisable(GL_LIGHTING);
 	//glDisable(GL_CULL_FACE);
-    cout << "[DRAW ILUMINACION SUAVE]" << endl;
+
 }
 
 
@@ -1096,3 +1108,50 @@ void tablero_textura(float lado, int n) {
     }
 }
 */
+
+
+//*********************************************************************
+// clase tablero
+//*********************************************************************
+
+_tablero::_tablero(){}
+
+void _tablero::draw_tablero(float lado, int n, GLuint textura_id, bool transpuesta){
+  glDisable(GL_LIGHTING);
+  glDisable(GL_NORMALIZE);
+  glColor3f(1, 1, 1);
+
+  glEnable(GL_TEXTURE_2D);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, textura_id);
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+  for (int i = 0; i < n; i++){
+    for (int j = 0; j < n; j++){
+      glBegin(GL_POLYGON);
+
+      if (!transpuesta){
+        glTexCoord2d(j/(1.0*n), (n - i)/(1.0*n));
+        glVertex3f(j*lado/(1.0*n), i*lado/(1.0*n), 0.0);
+        glVertex3f((j+1)*lado/(1.0*n), i*lado/(1.0*n), 0.0);
+        glVertex3f((j+1)*lado/(1.0*n), (i+1.0)*lado/(1.0*n), 0.0);
+        glVertex3f(j*lado/(1.0*n), (i+1.0)*lado/(1.0*n), 0.0);
+      }
+      else {
+        glTexCoord2d((n-i)/(1.0*n), j/(1.0*n));
+        glVertex3f(i*lado/(1.0*n), j*lado/(1.0*n), 0.0);
+        glVertex3f(i*lado/(1.0*n), (j+1)*lado/(1.0*n), 0.0);
+        glVertex3f((i+1.0)*lado/(1.0*n), (j+1)*lado/(1.0*n), 0.0);
+        glVertex3f((i+1.0)*lado/(1.0*n), j*lado/(1.0*n), 0.0);  
+      }
+
+      glEnd();
+      }
+  }
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glDisable(GL_TEXTURE_2D);
+}
+

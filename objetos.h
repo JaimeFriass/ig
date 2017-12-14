@@ -9,6 +9,7 @@
 #include <math.h>
 #include <unistd.h>
 #include <time.h>
+#include "CImg.h"
 
 using namespace std;
 
@@ -114,7 +115,8 @@ class _triangulos3D : public _puntos3D
 							   {0.633, 0.727, 0.633, 0.55}, // Emerald
 							   {0.31, 0.31, 0.31, 0.95}, // Jade
 						       {0.33, 0.32, 0.34, 0.82}}; // Obsidian
-	float brillo[18] = { 27.89, 25.6, 76.8, 76.8, 12.8, 51.2, 51.2, 51.2, 83.2, 51.2, 89.6, 76.8, 12.8, 38.4, 11.2, 76.8, 12.8, 32}; 			   // Exponente del brillo
+	float brillo[18] = { 27.89, 25.6, 76.8, 76.8, 12.8, 51.2, 51.2, 51.2, 83.2, 51.2,
+	                     89.6, 76.8, 12.8, 38.4, 11.2, 76.8, 12.8, 32}; 			// Exponente del brillo
 
 	bool modo_text;            // Generación automática o no de las coords de textura
 	GLfloat plano_s[4];        // Si modo_text=true se usan esttos coeficientes
@@ -230,7 +232,7 @@ class _lego : public _triangulos3D
 	 void legs();
 
 	 // Función principal, se actualizará continuamente.
-	 void draw(char modo);
+	 void draw(const int &modo, const int &material);
 
 	 GLfloat mov[QUIT];
  };
@@ -238,30 +240,36 @@ class _lego : public _triangulos3D
 class _cabeza : public _ply
 {
 public:
-	_cabeza(char modo);
+	_cabeza(const int &modo, const int &material);
 	void draw(float r1, float g1, float b1);
 };
 
 class _pierna : public _ply
 {
 public:
-	_pierna(char modo);
+	_pierna(const int &modo, const int &material);
 };
 
 class _mano_izq : public _ply
 {
 public:
-	_mano_izq(char modo);
+	_mano_izq(const int &modo, const int &material);
 };
 
 class _mano_der : public _ply
 {
 public:
-	_mano_der(char modo);
+	_mano_der(const int &modo, const int &material);
 };
 
 class _pecho : public _ply
 {
 public:
-	_pecho(char modo);
+	_pecho(const int &modo, const int &material);
+};
+
+class _tablero: public _triangulos3D{
+public:
+  _tablero();
+  void draw_tablero(float lado, int n, GLuint textura_id, bool transpuesta);
 };
