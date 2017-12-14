@@ -661,6 +661,8 @@ void _lego::draw(char modo) {
 
 
 }
+
+
 //////////////////////////////////////////////////////////
 //                      REVENTAR
 
@@ -783,6 +785,20 @@ void _lego::cabeza_adelante() {
 //           LUCES
 //////////////////////////////////////////////////
 
+
+void _triangulos3D::draw(const int &modo, const int &material) {
+    switch(modo) {
+        case 1: draw_puntos(0, 0, 0, 5); break;		
+		case 2: draw_aristas(0.0, 0.0, 0.0, 1);
+        case 3: draw_solido(0.2, 0.95, 0.7); 
+                draw_aristas(0,0,0,1); break;
+		case 4: draw_solido_ajedrez(0.87, 0.67, 0.95, 0.95, 0.65, 0.87); 
+                draw_aristas(0,0,0,1); break;
+		case 5: draw_iluminacion_plana(material); break;
+		case 6: draw_iluminacion_suave(material); break;
+		case 7: draw_textura(0); break;
+    }
+}
 // Cálculo de las normales de las caras
 void _triangulos3D::calcular_normales_caras(){
 	normales_caras.resize(caras.size());
@@ -799,16 +815,14 @@ void _triangulos3D::calcular_normales_caras(){
 	}
 
 	b_normales_caras = true;
-    cout << "[CALCULO NORMALES CARAS]" << endl;
 }
 
 // Cálculo de las normales de los vértices
 void _triangulos3D::calcular_normales_vertices(){
     
     if(b_normales_vertices==false){
-        if(b_normales_caras ==false){
+        if(b_normales_caras ==false)
             calcular_normales_caras();
-        }
         normales_vertices.resize(vertices.size());
         for(int i =0 ; i< caras.size() ; i++){
             normales_vertices[caras[i]._0].x += normales_caras[i].x;
@@ -825,11 +839,10 @@ void _triangulos3D::calcular_normales_vertices(){
         }
     }
     b_normales_vertices=true;
-    cout << "[CALCULO NORMALES VERTICES]" << endl;
 }
 
 // Dibujar con iluminación y sin suavizado. Terminada
-void _triangulos3D::draw_iluminacion_plana(){
+void _triangulos3D::draw_iluminacion_plana(const int &material){
 	int i;
 	GLfloat ambient_component[4]={1,1,1,1};
 
@@ -843,11 +856,12 @@ void _triangulos3D::draw_iluminacion_plana(){
 	glShadeModel(GL_FLAT);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
 	glEnable(GL_NORMALIZE);
 
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *) &ambiente_difusa);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *) &ambiente_difusa[material]);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular[material]);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo[material]);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBegin(GL_TRIANGLES);
@@ -862,11 +876,10 @@ void _triangulos3D::draw_iluminacion_plana(){
 	glEnd();
 	glDisable(GL_LIGHTING);
 	//glDisable(GL_CULL_FACE);
-    cout << "[DRAW ILUMINACION PLANA]" << endl;
 }
 
 // Dibujar con iluminación y con suavizado. Terminada
-void _triangulos3D::draw_iluminacion_suave(){
+void _triangulos3D::draw_iluminacion_suave(const int &material){
 	int i;
 	GLfloat ambient_component[4]={1,1,1,1};
 
@@ -880,11 +893,12 @@ void _triangulos3D::draw_iluminacion_suave(){
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
 	glEnable(GL_NORMALIZE);
 
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *) &ambiente_difusa);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *) &ambiente_difusa[material]);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular[material]);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo[material]);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBegin(GL_TRIANGLES);
@@ -958,8 +972,8 @@ void _triangulos3D::draw_textura_iluminacion_plana(GLuint ident_textura) {
     glEnable(GL_NORMALIZE);
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material_blanco);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular);
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular[0]);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo[0]);
 
     // Activación de la textura
     glEnable(GL_TEXTURE_2D);
@@ -1015,8 +1029,8 @@ void _triangulos3D::draw_textura_iluminacion_suave(GLuint ident_textura){
 	glEnable(GL_NORMALIZE);
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material_blanco);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &especular[0]);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo[0]);
 
 	// activación de la textura
 	glEnable(GL_TEXTURE_2D);

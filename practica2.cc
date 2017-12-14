@@ -17,6 +17,9 @@
 const int AXIS_SIZE = 5000;
 char teclaPulsada;
 int modo;
+int figura;
+int material = 0;
+
 // variables que definen la posicion de la camara en coordenadas polares
 GLfloat Observer_distance;
 GLfloat Observer_angle_x;
@@ -26,17 +29,17 @@ GLfloat Observer_angle_y;
 
 _puntos3D puntos(); 
 _triangulos3D triangulo();
-_revolucion revo();
+//_revolucion revo();
+
 _piramide lapira(5,7);
 _cubo elcubo(5);
 _ply objeto("./ply_files/beethoven.ply",1);
+//_revolucion_inv revo(vertices, 6, true, true);
 
 _lego legamen;
 
+int alfa = 0;
 
-bool iluminacion = false;
-bool textura = false;
-bool plana = true;
 
 // variables que controlan la ventana y la transformacion de perspectiva
 GLfloat Window_width, Window_height, Front_plane, Back_plane;
@@ -106,12 +109,31 @@ void draw_axis()
 	glEnd();
 }
 void luces() {
+
+	/*
 	GLfloat light_position[4] = {0,1,1,0};
 
 	glDisable(GL_LIGHT0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+	*/
+	GLfloat light_position[4]={0,1,1,0},
+			light1_position[4]={0,1,1,1},
+			light1_ambient[4]={0.1,0.1,0.1,1},
+			light1_intensity[4]= {1,0.1,0.0,5};
+
+
+	glLightfv(GL_LIGHT1, GL_POSITION,light1_position);
+	glLightfv(GL_LIGHT1, GL_AMBIENT,light1_ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE,light1_intensity);
+	glLightfv(GL_LIGHT1, GL_SPECULAR,light1_intensity);
+	
+	glPushMatrix();
+		glRotatef(alfa,1,0,0); // El primer valor seria alfa	
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glPopMatrix();
 }
 //**************************************************************************
 // Funcion que dibuja los objetos
@@ -119,218 +141,203 @@ void luces() {
 
 void draw_objects()
 {
-
-	if (teclaPulsada == '1') {
-		cout << "MODO PIRAMIDE\n---------" << endl;
-		lapira.draw_solido(0.2,1,1);
-		modo = 1;
-		
-	} else if (teclaPulsada == '2') {
-		//cout << "MODO CUBO\n---------" << endl;
-
-		modo = 2;
-		elcubo.draw_solido(0.3,1,0.6);
-		
-	} else if (teclaPulsada == '3') {
-		modo = 3;
-		//cout << "MODO PLY\n---------" << endl;
-		
-	} else if (teclaPulsada == '4') {
-		modo = 4;
-		//cout << "MODO REVOLUCION\n------------" << endl;
-	} else if (teclaPulsada == '5') {
-		modo = 5;
-		//cout << "MODO LEGO\n-------------" << endl;
-	} else if (teclaPulsada == '6') {
-		modo = 6;
-	}
-
-	if (modo == 1) {
-
-
-		lapira.draw_solido(0,1,1);
-		lapira.draw_aristas(0,0,0,2);
-		if (teclaPulsada == 'p')
-			lapira.draw_puntos(1, 0, 0, 10);
-		else if (teclaPulsada ==  'l')
-			lapira.draw_aristas(0, 0, 0, 2);
-		else if (teclaPulsada == 'f') {
-			lapira.draw_solido(0,1,0);
-			lapira.draw_aristas(0,0,0,2);
-		} else if (teclaPulsada == 'c') {
-			lapira.draw_solido_ajedrez(1,0,0,0,1,0);
-			lapira.draw_aristas(0,0,0,2);
-		} else if (teclaPulsada == 'i') {
-
-			if (!iluminacion && plana) {
-				cout << "Iluminación plana activada." << endl;
-				lapira.draw_iluminacion_plana();
-				iluminacion = true;
-
-			} else if (!iluminacion && !plana) {
-				cout << "Iluminación suave activada." << endl;
-				lapira.draw_iluminacion_suave();
-				iluminacion = true;
-
-			}
-			else {
-				iluminacion = false;
-			}
-
-		} else if (teclaPulsada == 't') {
-			if (!textura && plana) {
-				//
-			}
-		} else if (teclaPulsada == 's') {
-			if (!plana) {
-				plana = true;
-				cout << "Suavidad desactivada" << endl;
-			}
-			else {
-				plana = false;
-				cout << "Suavidad activada." << endl;
-			}
-		}
-	}
-	// MODO CUBO
-	if (modo == 2) {
-		elcubo.draw_solido(1,1,1);
-		elcubo.draw_aristas(0, 0, 0, 2);
-		if (teclaPulsada == 'p')
-			elcubo.draw_puntos(0.9, 0.23, 0.4, 1);
-		else if (teclaPulsada ==  'l')
-			elcubo.draw_aristas(0.01, 0.52, 0.2, 3);
-		else if (teclaPulsada == 'f') {
-			elcubo.draw_solido(0,1,1);
-			elcubo.draw_aristas(0,0,0,2);
-		} else if (teclaPulsada == 'c') {
-			elcubo.draw_solido_ajedrez(1,0,0,0,1,0);
-			elcubo.draw_aristas(0,0,0,2);
-		}
-	} 
 	
-	// MODO PLY
-	if (modo == 3) {
-		objeto.draw_solido(0.142, 0.01, 1);
-		objeto.draw_aristas(0,0,0,1);
-		if (teclaPulsada == 'p') {
-			objeto.draw_puntos(0.9, 0.23, 0.4, 1);
-			cout << "Dibujando puntos?" << endl;
-		}
-		else if (teclaPulsada ==  'l')
-			objeto.draw_aristas(0, 0, 0, 2);
-		else if (teclaPulsada == 'f') {
-			objeto.draw_solido(0.142, 0.01, 1);
-			objeto.draw_aristas(0, 0, 0, 2);
-		} else if (teclaPulsada == 'c') {
-			objeto.draw_solido_ajedrez(1,0,0,0,1,0);
-			objeto.draw_aristas(0,0,0,2);
-		} else if (teclaPulsada == 'i') {
 
-			if (!iluminacion && plana) {
-				cout << "Iluminación plana activada." << endl;
-				objeto.draw_iluminacion_plana();
-				iluminacion = true;
-
-			} else if (!iluminacion && !plana) {
-				cout << "Iluminación suave activada." << endl;
-				objeto.draw_iluminacion_suave();
-				iluminacion = true;
-
-			}
-			else {
-				iluminacion = false;
-			}
-
-		} else if (teclaPulsada == 't') {
-			if (!textura && plana) {
-				//
-			}
-		} else if (teclaPulsada == 's') {
-			if (!plana) {
-				plana = true;
-				cout << "Suavidad desactivada" << endl;
-			}
-			else {
-				plana = false;
-				cout << "Suavidad activada." << endl;
-			}
-		}
+	switch(figura) {
+		case 1: lapira.draw(modo, material); break;
+		case 2: elcubo.draw(modo, material); break;
+		case 3: objeto.draw(modo, material); break;
+		//case 4: revo.draw(modo, material); break;
+		case 5: legamen.draw(modo); break;
 	}
 
-	if (modo == 6) {
-		vector<_vertex3f> vertices;
-		vertices.resize(11);
-		vertices[0].x = 1;   vertices[0].y = -1.4; vertices[0].z = 0;
-		vertices[1].x = 1;   vertices[1].y = -1.1; vertices[1].z = 0;
-		vertices[2].x = 0.5; vertices[2].y = -0.7; vertices[2].z = 0;
-		vertices[3].x = 0.4; vertices[3].y = -0.4; vertices[3].z = 0;
-		vertices[4].x = 0.4; vertices[4].y =  0.5; vertices[4].z = 0;
-		vertices[5].x = 0.5; vertices[5].y =  0.6; vertices[5].z = 0;
-		vertices[6].x = 0.3; vertices[6].y =  0.6; vertices[6].z = 0;
-		vertices[7].x = 0.5; vertices[7].y =  0.8; vertices[7].z = 0;
-		vertices[8].x = 0.55;vertices[8].y =  1.0; vertices[8].z = 0;
-		vertices[9].x = 0.5; vertices[9].y =  1.2; vertices[9].z = 0;
-		vertices[10].x= 0.3; vertices[10].y=  1.4; vertices[10].z= 0;
+	/// Selecciona el modo / objeto
+	/*
+	switch(teclaPulsada) {
+		case '1': modo = 1; break;
+		case '2': modo = 2; break;
+		case '3': modo = 3; break;
+		case '4': modo = 4; break;
+		case '5': modo = 5; break;
+		case '6': modo = 6; break;
+	}
 
-		for (int i = 0; i < vertices.size(); i++) {
-			vertices[i].x = vertices[i].x*4;
-			vertices[i].y = vertices[i].y*4;
-			vertices[i].z = vertices[i].z*4;
-		}
+	*/
+	/*
+	switch (modo) {
+		case 1: {
+				lapira.draw_solido(0,1,1);
+				lapira.draw_aristas(0,0,0,2);
+				if (teclaPulsada == 'p')
+					lapira.draw_puntos(1, 0, 0, 10);
+				else if (teclaPulsada ==  'l')
+					lapira.draw_aristas(0, 0, 0, 2);
+				else if (teclaPulsada == 'f') {
+					lapira.draw_solido(0,1,0);
+					lapira.draw_aristas(0,0,0,2);
+				} else if (teclaPulsada == 'c') {
+					lapira.draw_solido_ajedrez(1,0,0,0,1,0);
+					lapira.draw_aristas(0,0,0,2);
+				} else if (teclaPulsada == 'i') {
 
-		_revolucion revo(vertices, 50, true, true);
-		revo.draw_solido(0.5,0.5,1);
-		revo.draw_aristas(0,0,0,2);
-		if (teclaPulsada == 'p')
-			revo.draw_puntos(0.9, 0.23, 0.4, 5);
-		else if (teclaPulsada == 'l')
-			revo.draw_aristas(0,0,0,2);
-		else if (teclaPulsada == 'f') {
+					if (!iluminacion && plana) {
+						cout << "Iluminación plana activada." << endl;
+						lapira.draw_iluminacion_plana();
+						iluminacion = true;
+
+					} else if (!iluminacion && !plana) {
+						cout << "Iluminación suave activada." << endl;
+						lapira.draw_iluminacion_suave();
+						iluminacion = true;
+
+					}
+					else {
+						iluminacion = false;
+					}
+
+				} else if (teclaPulsada == 't') {
+					if (!textura && plana) {
+						//
+					}
+				} else if (teclaPulsada == 's') {
+					if (!plana) {
+						plana = true;
+						cout << "Suavidad desactivada" << endl;
+					}
+					else {
+						plana = false;
+						cout << "Suavidad activada." << endl;
+					}
+				}
+				break;
+				}
+		case 2: {
+			elcubo.draw_solido(1,1,1);
+			elcubo.draw_aristas(0, 0, 0, 2);
+			if (teclaPulsada == 'p')
+				elcubo.draw_puntos(0.9, 0.23, 0.4, 1);
+			else if (teclaPulsada ==  'l')
+				elcubo.draw_aristas(0.01, 0.52, 0.2, 3);
+			else if (teclaPulsada == 'f') {
+				elcubo.draw_solido(0,1,1);
+				elcubo.draw_aristas(0,0,0,2);
+			} else if (teclaPulsada == 'c') {
+				elcubo.draw_solido_ajedrez(1,0,0,0,1,0);
+				elcubo.draw_aristas(0,0,0,2);
+			}
+			break;
+			}
+		
+
+		case 3: {
+			switch (teclaPulsada) {
+				case 'p': objeto.draw_puntos(0.9, 0.23, 0.4, 1); break;
+				case 'l': objeto.draw_aristas(0, 0, 0, 2); break;
+				case 'f': objeto.draw_solido(0.142, 0.01, 1);
+						  objeto.draw_aristas(0, 0, 0, 2); break;
+				case 'c': objeto.draw_solido_ajedrez(1,0,0,0,1,0);
+						  objeto.draw_aristas(0,0,0,2); break;
+				case 'i':
+					if (!iluminacion && plana) {
+						cout << "Iluminación plana activada." << endl;
+						objeto.draw_iluminacion_plana();
+						iluminacion = true;
+
+					} else if (!iluminacion && !plana) {
+						cout << "Iluminación suave activada." << endl;
+						objeto.draw_iluminacion_suave();
+						iluminacion = true;
+
+					}
+					else {
+						iluminacion = false;
+					}
+					break;
+				case 's':
+					if (!plana) {
+						plana = true;
+						cout << "Suavidad desactivada" << endl;
+					}
+					else {
+						plana = false;
+						cout << "Suavidad activada." << endl;
+					}
+					break;
+			}
+			break;
+			}
+
+		case 6: {
+			vector<_vertex3f> vertices;
+			vertices.resize(11);
+			vertices[0].x = 1;   vertices[0].y = -1.4; vertices[0].z = 0;
+			vertices[1].x = 1;   vertices[1].y = -1.1; vertices[1].z = 0;
+			vertices[2].x = 0.5; vertices[2].y = -0.7; vertices[2].z = 0;
+			vertices[3].x = 0.4; vertices[3].y = -0.4; vertices[3].z = 0;
+			vertices[4].x = 0.4; vertices[4].y =  0.5; vertices[4].z = 0;
+			vertices[5].x = 0.5; vertices[5].y =  0.6; vertices[5].z = 0;
+			vertices[6].x = 0.3; vertices[6].y =  0.6; vertices[6].z = 0;
+			vertices[7].x = 0.5; vertices[7].y =  0.8; vertices[7].z = 0;
+			vertices[8].x = 0.55;vertices[8].y =  1.0; vertices[8].z = 0;
+			vertices[9].x = 0.5; vertices[9].y =  1.2; vertices[9].z = 0;
+			vertices[10].x= 0.3; vertices[10].y=  1.4; vertices[10].z= 0;
+
+			for (int i = 0; i < vertices.size(); i++) {
+				vertices[i].x = vertices[i].x*4;
+				vertices[i].y = vertices[i].y*4;
+				vertices[i].z = vertices[i].z*4;
+			}
+
+			_revolucion revo(vertices, 50, true, true);
 			revo.draw_solido(0.5,0.5,1);
 			revo.draw_aristas(0,0,0,2);
-		} else if (teclaPulsada == 'c') {
-			revo.draw_solido_ajedrez(1,0,1,0,1,0);
-			revo.draw_aristas(0,0,0,2);
-		}
-	}
+			if (teclaPulsada == 'p')
+				revo.draw_puntos(0.9, 0.23, 0.4, 5);
+			else if (teclaPulsada == 'l')
+				revo.draw_aristas(0,0,0,2);
+			else if (teclaPulsada == 'f') {
+				revo.draw_solido(0.5,0.5,1);
+				revo.draw_aristas(0,0,0,2);
+			} else if (teclaPulsada == 'c') {
+				revo.draw_solido_ajedrez(1,0,1,0,1,0);
+				revo.draw_aristas(0,0,0,2);
+			}
+			break;
+			}
+		case 4: {
+			vector<_vertex3f> vertices;
+			vertices.resize(3);
+			vertices[0].x = 1;   vertices[0].y = -1; vertices[0].z = 0;
+			vertices[1].x = 0;   vertices[1].y = 0; vertices[1].z = 0;
+			vertices[2].x = 1; vertices[2].y = 1; vertices[2].z = 0;
 
-	if (modo == 4) {
-		vector<_vertex3f> vertices;
-		vertices.resize(3);
-		vertices[0].x = 1;   vertices[0].y = -1; vertices[0].z = 0;
-		vertices[1].x = 0;   vertices[1].y = 0; vertices[1].z = 0;
-		vertices[2].x = 1; vertices[2].y = 1; vertices[2].z = 0;
+			for (int i = 0; i < vertices.size(); i++) {
+				vertices[i].x = vertices[i].x*3;
+				vertices[i].y = vertices[i].y*3;
+				vertices[i].z = vertices[i].z*3;
+			}
 
-		for (int i = 0; i < vertices.size(); i++) {
-			vertices[i].x = vertices[i].x*3;
-			vertices[i].y = vertices[i].y*3;
-			vertices[i].z = vertices[i].z*3;
-		}
-
-		_revolucion_inv revo(vertices, 6, true, true);
-		revo.draw_solido(0.5,0.7,1);
-		revo.draw_aristas(0,0,0,2);
-		if (teclaPulsada == 'p')
-			revo.draw_puntos(0.9, 0.23, 0.4, 5);
-		else if (teclaPulsada == 'l')
-			revo.draw_aristas(0,0,0,2);
-		else if (teclaPulsada == 'f') {
+			_revolucion_inv revo(vertices, 6, true, true);
 			revo.draw_solido(0.5,0.7,1);
 			revo.draw_aristas(0,0,0,2);
-		} else if (teclaPulsada == 'c') {
-			revo.draw_solido_ajedrez(1,0,1,0,1,0);
-			revo.draw_aristas(0,0,0,2);
-		}
+			if (teclaPulsada == 'p')
+				revo.draw_puntos(0.9, 0.23, 0.4, 5);
+			else if (teclaPulsada == 'l')
+				revo.draw_aristas(0,0,0,2);
+			else if (teclaPulsada == 'f') {
+				revo.draw_solido(0.5,0.7,1);
+				revo.draw_aristas(0,0,0,2);
+			} else if (teclaPulsada == 'c') {
+				revo.draw_solido_ajedrez(1,0,1,0,1,0);
+				revo.draw_aristas(0,0,0,2);
+			}
+			break;
+			}	
+		case 5: legamen.draw(teclaPulsada); break;
 	}
-
-	if (modo == 5) {legamen.draw(teclaPulsada);}
-
 	teclaPulsada = '0';
+	*/
 	glutPostRedisplay();
-
-
-
 }
 
 //**************************************************************************
@@ -377,6 +384,30 @@ void normal_keys(unsigned char Tecla1, int x, int y)
 	teclaPulsada = Tecla1;
 	if (toupper(Tecla1) == 'Q')
 		exit(0);
+
+	switch(Tecla1) {
+		case 'p': modo = 1; break;
+		case 'l': modo = 2; break;
+		case 'f': modo = 3; break;
+		case 'c': modo = 4; break;
+		case 'i': modo = 5; break;
+		case 's': modo = 6; break;
+		case 't': modo = 7; break;
+
+		case '1': figura = 1; break;
+		case '2': figura = 2; break;
+		case '3': figura = 3; break;
+		case '4': figura = 4; break;
+		case '5': figura = 5; break;
+
+		case '9':
+			alfa = alfa - 5; break;
+		case '0':
+			alfa = alfa + 5; break;
+
+		case '8': material = (material+1)%18; 
+		break;
+	}
 }
 
 //***************************************************************************
@@ -416,8 +447,14 @@ void special_keys(int Tecla1, int x, int y)
 
 	if (modo == 3) {
 		switch (Tecla1) {
-			case GLUT_KEY_F1: objeto.draw_iluminacion_plana(); break;
-			case GLUT_KEY_F2: objeto.draw_iluminacion_suave(); break;
+			case GLUT_KEY_F1: 
+							objeto.draw_solido(0.142, 0.01, 1);
+				objeto.draw_aristas(0,0,0,1); 
+				objeto.draw_iluminacion_plana(material);
+
+				cout << "ASDIJADSJADSDA" << endl;
+			break;
+			case GLUT_KEY_F2: objeto.draw_iluminacion_suave(material); break;
 			case GLUT_KEY_F3: objeto.draw_textura_iluminacion_plana(0); break;
 			case GLUT_KEY_F4: objeto.draw_textura_iluminacion_suave(0); break;
 		}
@@ -425,8 +462,8 @@ void special_keys(int Tecla1, int x, int y)
 
 	if (modo == 2) {
 		switch (Tecla1) {
-			case GLUT_KEY_F1: elcubo.draw_iluminacion_plana(); break;
-			case GLUT_KEY_F2: elcubo.draw_iluminacion_suave(); break;
+			case GLUT_KEY_F1: elcubo.draw_iluminacion_plana(material); break;
+			case GLUT_KEY_F2: elcubo.draw_iluminacion_suave(material); break;
 			case GLUT_KEY_F3: elcubo.draw_textura_iluminacion_plana(0); break;
 			case GLUT_KEY_F4: elcubo.draw_textura_iluminacion_suave(0); break;
 		}
@@ -468,7 +505,8 @@ void initialize(void)
 
 	// se indica cual sera el color para limpiar la ventana	(r,v,a,al)
 	// blanco=(1,1,1,1) rojo=(1,0,0,1), ...
-	glClearColor(0.95, 0.95, 0.7, 1);
+	//glClearColor(0.95, 0.95, 0.7, 1);
+	glClearColor(1, 1, 1, 1);
 
 	// se habilita el z-bufer
 	glEnable(GL_DEPTH_TEST);
@@ -476,6 +514,7 @@ void initialize(void)
 	change_projection();
 	//
 	glViewport(0, 0, UI_window_width, UI_window_height);
+	
 }
 
 //***************************************************************************
@@ -511,7 +550,7 @@ int main(int argc, char **argv)
 
 	// llamada para crear la ventana, indicando el titulo (no se visualiza hasta que se llama
 	// al bucle de eventos)
-	glutCreateWindow("Practica 3 - Lego");
+	glutCreateWindow("Practica 4 - Iluminacion");
 
 	// asignación de la funcion llamada "dibujar" al evento de dibujo
 	glutDisplayFunc(draw_scene);
